@@ -56,7 +56,7 @@ export function MailDisplay({ mail }) {
       };
 
       try {
-        const response = await axios.post('http://127.0.0.1:5000/process_reviews', dataToSend);
+        const response = await axios.post('https://mini-project-final-7.onrender.com/process_reviews', dataToSend);
         const data = response.data.insights;
         setData(data) // Assuming the response contains the data in `response.data`
         console.log('Response:', data);
@@ -72,7 +72,7 @@ export function MailDisplay({ mail }) {
       };
 
       try {
-        const response = await axios.post('http://127.0.0.1:5000/trends_review', dataToSend);
+        const response = await axios.post('https://mini-project-final-7.onrender.com/trends_review', dataToSend);
         const data = response.data.trends;
         setTrendsData(data) // Assuming the response contains the data in `response.data`
         console.log('Response:', data);
@@ -88,7 +88,7 @@ export function MailDisplay({ mail }) {
       };
 
       try {
-        const response = await axios.post('http://127.0.0.1:5000/analyze', dataToSend);
+        const response = await axios.post('https://mini-project-final-7.onrender.com/analyze', dataToSend);
         const data = response.data;
         setTags(data) // Assuming the response contains the data in `response.data`
         console.log('Response:', data);

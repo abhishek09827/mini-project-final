@@ -22,7 +22,7 @@ export function UserAuthForm() {
     event.preventDefault();
     setIsLoading(true);
     try {
-      const response = await axios.post('http://127.0.0.1:5000/register', formData);
+      const response = await axios.post('https://mini-project-final-7.onrender.com/register', formData);
       console.log(response);
       const data = await response.data.response;
       console.log('Response:', data);

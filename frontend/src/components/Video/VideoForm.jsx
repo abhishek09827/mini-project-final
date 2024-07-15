@@ -49,7 +49,7 @@ export default function VideoUpload() {
       const formData = new FormData();
       formData.append('video', videoFile);
 
-      const response = await axios.post('http://127.0.0.1:5000/upload', formData,
+      const response = await axios.post('https://mini-project-final-7.onrender.com/upload', formData,
        { 
         headers: {
           'Content-Type': 'multipart/form-data',
