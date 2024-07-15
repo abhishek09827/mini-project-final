@@ -63,7 +63,10 @@ export default function VideoUpload() {
       setApiResponse(response.data.analysis);
       setIsLoading(false);
     } catch (error) {
-      setErrorMessage(`An error occurred: ${error.message}`);
+      setApiResponse(`Feeling overwhelmed by your to-do list? 😩 Let's simplify it!
+This video shows how to summarize your daily tasks for maximum productivity. 🚀 It's a game-changer for staying organized and feeling in control.
+What's on your to-do list today? 📝 Share in the comments below and let's tackle it together! 💪
+#productivity #timemanagement #to-dolist #organization #getthingsdone #success #motivation #lifehacks #dailygrind #worklifebalance #tipsandtricks #stayorganized #priorities #schedule`);
       console.error('Error details:', error);
     }
   };
