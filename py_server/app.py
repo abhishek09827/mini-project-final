@@ -18,7 +18,7 @@ from werkzeug.utils import secure_filename
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://mini-project-final-liart.vercel.app"}})
+CORS(app, resources={r"/*": {"origins": "https://mini-project-final-lti6lwi2c-abhishek09827s-projects.vercel.app"}})
 
 # MongoDB setup
 client = MongoClient(os.getenv("MONGO_URI"))
