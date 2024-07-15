@@ -37,7 +37,7 @@ export function Form({pred, setPred}) {
     };
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/predict', data);
+      const response = await axios.post('https://mini-project-final-7.onrender.com/predict', data);
       console.log('Response:', response);
       setPred(response.data.predictions)
     } catch (error) {
