@@ -226,9 +226,7 @@ def upload_video():
 
     video = genai.upload_file(path=video_path)
 
-    prompt = ("You are a marketing insights analyst reviewing the uploaded advertising video from my social media page. "
-              "Describe the key elements and actions in the video. Provide a detailed report in 100-200 words, including insights on the video's effectiveness, "
-              "audience engagement, and any patterns observed. Offer suggestions for improvement and optimization. Maintain a formal and professional tone.")
+    prompt = ("You are a creative social media strategist. Write an engaging and captivating caption for the given video that will be posted on social media. The caption should be between 50 to 100 words and should include elements that attract attention, encourage interaction, and reflect the essence of the video. Make sure to include relevant hashtags, a call to action, and maintain an upbeat and positive tone.")
 
     safety_settings = [
         {
