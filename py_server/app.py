@@ -13,28 +13,29 @@ import joblib
 import numpy as np
 import google.generativeai as genai
 from werkzeug.utils import secure_filename
-import time
+
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
-
+# MongoDB setup
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client.get_database('mini_project')
 users_collection = db.get_collection('companies')
 
-
+# Flask-Bcrypt and JWT setup
 bcrypt = Bcrypt(app)
 app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 jwt = JWTManager(app)
-genai.configure(api_key= os.getenv('GOOGLE_API_KEY'))
 
-
+# Google Generative AI configuration
+genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 chat_model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=os.getenv("GOOGLE_API_KEY"))
 
 # Prompts
-sentisysPrompt = '''You are sentiment analysis expert who can assign sentiment tags to user reviews.Analyze the sentiment of the following review: "{{text}}". You have to label the review as positive, negative or neutral. The output should be a JSON with fields "category" and "reason". The "category" field should be one of "positive", "negative", "neutral". The "reason" field should be a string explaining the reason for the category. \n\nReview: {text}\n\nOutput:''' 
+sentisysPrompt = '''You are sentiment analysis expert who can assign sentiment tags to user reviews.Analyze the sentiment of the following review: "{{text}}". You have to label the review as positive, negative or neutral. The output should be a JSON with fields "category" and "reason". The "category" field should be one of "positive", "negative", "neutral". The "reason" field should be a string explaining the reason for the category. \n\nReview: {text}\n\nOutput:'''
 entityTaggingPromptContent = '''You are an expert at labelling a given Instagram Review as bug, feature_request, question or feedback. You are given a review provided by a user for the app . You have to label the review as bug, feature_request, question or feedback. The output should be a JSON with fields "category" and "reason". The "category" field should be one of "bug", "feature_request", "question" or "feedback". The "reason" field should be a string explaining the reason for the category. \n\nReview: {text}\n\nOutput:'''
 intentClassificationPromptContent = '''You are an intent classification expert. Classify the intent of the following text: "{text}" into urgent, low and medium category label. The output should be a JSON with fields "category" and "reason". The "category" field should include the intent. The "reason" field should be a string explaining the reason for the category. \n\nReview: {text}\n\nOutput'''
 
@@ -54,15 +55,15 @@ intentClassificationChatPrompt = ChatPromptTemplate.from_messages([
     HumanMessagePromptTemplate.from_template(''),
 ])
 
-def register_user(name, password,insta_link, twitter_link, linkedin_link):
+def register_user(name, password, insta_link, twitter_link, linkedin_link):
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     user = {
         'name': name,
         'password': hashed_password,
-        'insta_link':insta_link,
-        'twitter_link':twitter_link,
+        'insta_link': insta_link,
+        'twitter_link': twitter_link,
         'linkedin_link': linkedin_link
-        }
+    }
     users_collection.insert_one(user)
 
 def verify_user(name, password):
@@ -76,7 +77,6 @@ model = joblib.load('impressions_model.pkl')
 @app.route('/register', methods=['POST'])
 def register():
     try:
-        
         data = request.get_json()
         name = data['name']
         password = data['password']
@@ -109,7 +109,6 @@ def login():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Your existing endpoints...
 @app.route('/analyze', methods=['POST'])
 def analyze_text():
     try:
@@ -117,35 +116,27 @@ def analyze_text():
         # Sentiment Analysis
         chain = LLMChain(llm=chat_model, prompt=sentichatPrompt)
         sentiment_result = chain.predict(text=text)
-        print(1)
         
         # Entity Tagging
         chain = LLMChain(llm=chat_model, prompt=entityTaggingChatPrompt)
         entity_tagging_result = chain.predict(text=text)
-        print(1)
         
         # Intent Classification
         chain = LLMChain(llm=chat_model, prompt=intentClassificationChatPrompt)
         intent_classification_result = chain.predict(text=text)
-        print(1)
         
         combined_result = {
             'sentiment_analysis': sentiment_result,
             'entity_tagging': entity_tagging_result,
             'intent_classification': intent_classification_result
         }
-        print(combined_result)
         
         categories = []
         for value in combined_result.values():
-            print(2)
             json_string = value.replace('```json\n', '').replace('\n```', '')
-            print(json_string)
             json_object = json.loads(json_string)
-            print(json_object)
             categories.append(json_object['category'])
-            print(2)
-        print(categories)
+        
         return jsonify(categories)
     
     except Exception as e:
@@ -227,20 +218,14 @@ def upload_video():
     genai.configure(api_key="AIzaSyCXkHl-KeeE39M-Fj0MhEVxzxk7h8Km44I")
     
     video_file = request.files['video']
-    print(video_file)
     name = secure_filename(video_file.filename)
-    print("name", name, video_file.filename)
     video_path = os.path.join(".", name)
     
     os.makedirs(os.path.dirname(video_path), exist_ok=True)
     video_file.save(video_path)
-    print(video_path)
 
-    video = genai.upload_file(path = video_path)
-    print(video.name)
-    print(genai.list_files())
+    video = genai.upload_file(path=video_path)
 
-    
     prompt = ("You are a marketing insights analyst reviewing the uploaded advertising video from my social media page. "
               "Describe the key elements and actions in the video. Provide a detailed report in 100-200 words, including insights on the video's effectiveness, "
               "audience engagement, and any patterns observed. Offer suggestions for improvement and optimization. Maintain a formal and professional tone.")
@@ -262,10 +247,8 @@ def upload_video():
     
     model = genai.GenerativeModel(model_name="models/gemini-1.5-flash", safety_settings=safety_settings)
 
-    print("Making LLM inference request...", model)
     response = model.generate_content([prompt, video], request_options={"timeout": 600})
 
-    print("response", response)
     return jsonify({"analysis": response.text})
 
 if __name__ == '__main__':
